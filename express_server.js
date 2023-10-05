@@ -84,6 +84,12 @@ app.post("/login", (req, res) => {
   res.redirect("/urls"); // Redirect back to the /urls page
 });
 
+app.post("/logout", (req, res) => {
+  res.clearCookie("username"); // Clear the username cookie
+  res.redirect("/urls"); // Redirect back to the /urls page (or any other desired page)
+});
+
+
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
