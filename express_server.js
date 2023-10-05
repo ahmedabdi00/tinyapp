@@ -4,9 +4,22 @@ const PORT = 8080; // default port 8080
 
 app.set("view engine", "ejs");
 
+// Function to generate a random string
+function generateRandomString() {
+  const length = 6; // You can adjust the length as needed
+  const characters =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+  let result = "";
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    result += characters.charAt(randomIndex);
+  }
+  return result;
+}
+
 const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
+  b2xVn2: "http://www.lighthouselabs.ca",
+  "9sm5xK": "http://www.google.com",
 };
 
 app.use(express.urlencoded({ extended: true }));
@@ -24,12 +37,30 @@ app.get("/urls/:id", (req, res) => {
 
 app.get("/urls", (req, res) => {
   const templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars); // "urls_index" should match your EJS file name without the extension
+  res.render("urls_index", templateVars);
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body); // Log the POST request body to the console
-  res.send("Ok"); // Respond with 'Ok' (we will replace this)
+  const longURL = req.body.longURL;
+  const shortURL = generateRandomString();
+
+  // Save the new URL mapping to the urlDatabase
+  urlDatabase[shortURL] = longURL;
+
+  // Redirect to the page showing the newly created URL
+  res.redirect(`/urls/${shortURL}`);
+});
+
+app.get("/u/:id", (req, res) => {
+  const shortURL = req.params.id;
+  const longURL = urlDatabase[shortURL];
+
+  if (longURL) {
+    res.redirect(longURL);
+  } else {
+    // Handle the case where the shortURL is not found
+    res.status(404).send("Short URL not found");
+  }
 });
 
 app.get("/", (req, res) => {
