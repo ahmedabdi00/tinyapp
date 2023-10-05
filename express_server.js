@@ -47,8 +47,28 @@ app.post("/urls", (req, res) => {
   // Save the new URL mapping to the urlDatabase
   urlDatabase[shortURL] = longURL;
 
-  // Redirect to the page showing the newly created URL
   res.redirect(`/urls/${shortURL}`);
+});
+
+app.post("/urls/:id/delete", (req, res) => {
+  const id = req.params.id;
+
+  // Use JavaScript's delete operator to remove the URL
+  delete urlDatabase[id];
+
+  // Redirect the client back to the urls_index page ("/urls")
+  res.redirect("/urls");
+});
+
+app.post("/urls/:id", (req, res) => {
+  const id = req.params.id;
+  const newLongURL = req.body.newLongURL; // Assuming you have a form field with name="newLongURL"
+
+  // Update the URL in your urlDatabase
+  urlDatabase[id] = newLongURL;
+
+  // Redirect the client back to /urls
+  res.redirect("/urls");
 });
 
 app.get("/u/:id", (req, res) => {

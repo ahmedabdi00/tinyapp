@@ -8,23 +8,44 @@
       integrity="sha384-GJzZqFGwb1QTTN6wy59ffF1BuGJpLSa9DkKMp0DgiMDm4iYMj70gZWKYbI706tWS"
       crossorigin="anonymous"
     />
-    <title>URL - TinyApp Example</title>
+    <title>TinyURL for: <%= longURL %></title>
+    <style>
+      /* Add custom styles for centering content */
+      .center-content {
+        text-align: center;
+        margin-top: 50px; /* Adjust as needed */
+      }
+    </style>
   </head>
 
   <body>
     <!-- Include the header partial -->
     <%- include('partials/_header') %>
 
-    <div class="card text-center">
-      <div class="card-header"></div>
-      <div class="card-body">
-        <h5 class="card-title">TinyURL for: <%= longURL %></h5>
-        <p class="card-text">
-          Short URL ID: <a href="/u/<%= id %>"><%= id %></a>
-        </p>
-      </div>
-      <div class="card-footer text-muted"></div>
+    <div class="center-content">
+      <!-- TinyURL for: -->
+      <h2>TinyURL for: <%= longURL %></h2>
+      <!-- Display the tiny URL version -->
+      <p>
+        Short URL ID:
+        <a href="/u/<%= id %>"><%= id %></a>
+      </p>
+
+      <!-- Form for updating the long URL -->
+      <form class="form-inline" action="/urls/<%= id %>" method="POST">
+        <div class="form-group mb-2">
+          <label for="newLongURL">New URL:</label>
+          <input
+            class="form-control"
+            type="text"
+            name="newLongURL"
+            placeholder="http://"
+          />
+          <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+      </form>
     </div>
+
     <!-- Bootstrap JS -->
     <script
       src="https://code.jquery.com/jquery-3.3.1.slim.min.js"

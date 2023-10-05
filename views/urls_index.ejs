@@ -19,16 +19,35 @@
       <div class="card-header"></div>
       <div class="card-body">
         <!-- Your content for urls_index goes here -->
-        <!-- For example, list of URLs -->
+        <!-- For example, list of URLs with Edit links -->
         <h5 class="card-title">List of URLs</h5>
-        <ul>
-          <% for (const shortURL in urls) { %>
-            <li>
-              <%= urls[shortURL] %> -
-              <a href="/u/<%= shortURL %>"><%= shortURL %></a>
-            </li>
-          <% } %>
-        </ul>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Original URL</th>
+              <th>Short URL</th>
+              <th>Edit</th>
+              <!-- Add Edit column -->
+            </tr>
+          </thead>
+          <tbody>
+            <% for (const shortURL in urls) { %>
+              <tr>
+                <td><%= urls[shortURL] %></td>
+                <td><a href="/u/<%= shortURL %>"><%= shortURL %></a></td>
+                <!-- Add Edit link -->
+                <td><a href="/urls/<%= shortURL %>">Edit</a></td>
+                <!-- Add Delete button -->
+                <td>
+                  <form method="POST" action="/urls/<%= shortURL %>/delete">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                  </form>
+                </td>
+              </tr>
+              
+            <% } %>
+          </tbody>
+        </table>
       </div>
       <div class="card-footer text-muted"></div>
     </div>
