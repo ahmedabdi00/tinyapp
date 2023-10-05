@@ -71,6 +71,12 @@ app.post("/urls/:id", (req, res) => {
   res.redirect("/urls");
 });
 
+app.post("/login", (req, res) => {
+  const { username } = req.body; // Get the username from the request body
+  res.cookie("username", username); // Set the username as a cookie
+  res.redirect("/urls"); // Redirect back to the /urls page
+});
+
 app.get("/u/:id", (req, res) => {
   const shortURL = req.params.id;
   const longURL = urlDatabase[shortURL];
