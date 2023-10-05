@@ -20,6 +20,9 @@
     </div>
 
     <!-- Add the login form here -->
+    <% if (username) { %>
+      <p>Welcome, <%= username %>!</p>
+    <% } else { %>
     <form class="form-inline ml-auto" action="/login" method="POST">
       <div class="form-group">
         <input
@@ -32,4 +35,5 @@
       <button type="submit" class="btn btn-light">Login</button>
     </form>
   </nav>
+  <% } %>
 </header>
