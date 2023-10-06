@@ -106,6 +106,10 @@ app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+app.get("/register", (req, res) => {
+  res.render("register");
+});
+
 app.use((req, res, next) => {
   res.locals.partialHeader = "partials/_header";
   next();
