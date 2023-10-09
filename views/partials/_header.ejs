@@ -1,3 +1,5 @@
+<!-- views/partials/_header.ejs -->
+
 <header>
   <nav class="navbar navbar-expand-md navbar-dark bg-success">
     <a class="navbar-brand" href="/urls">TinyApp</a>
@@ -15,29 +17,19 @@
     <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
       <div class="navbar-nav">
         <a class="nav-item nav-link" href="/urls">My URLs</a>
-        <a class="nav-item nav-link" href="/urls/new">Create New URL</a>
+        <% if (user) { %>
+          <a class="nav-item nav-link" href="/logout">Logout</a>
+        <% } %>
       </div>
     </div>
-
-   <!-- Add the login/logout form here -->
-<% if (username) { %>
-  <p>Welcome, <%= username %>!</p>
-  <form class="form-inline ml-auto" action="/logout" method="POST">
-    <button type="submit" class="btn btn-light">Logout</button>
-  </form>
-<% } else { %>
-  <form class="form-inline ml-auto" action="/login" method="POST">
-    <div class="form-group">
-      <input
-        type="text"
-        class="form-control"
-        name="username"
-        placeholder="Username"
-      />
+    <div class="navbar-nav ml-auto"> <!-- Move the login and register buttons to the right -->
+      <% if (!user) { %>
+        <a class="btn nav-link" href="/login">Login</a> <!-- Style it as a button -->
+        <a class="btn nav-link" href="/register">Register</a> <!-- Style it as a button -->
+      <% } else { %>
+        <span class="nav-item nav-link">Logged in as <%= user.email %></span>
+        <a class="btn nav-link" href="/logout">Logout</a> <!-- Style it as a button -->
+      <% } %>
     </div>
-    <button type="submit" class="btn btn-light">Login</button>
-  </form>
-<% } %>
-
   </nav>
 </header>

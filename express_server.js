@@ -1,11 +1,16 @@
+//express_server.js
+
 const express = require("express");
 const app = express();
 const PORT = 8080; // default port 8080
-const cookieParser = require('cookie-parser');
+const cookieParser = require("cookie-parser");
+const bcrypt = require("bcrypt"); // For password hashing
 app.use(cookieParser());
 
-
 app.set("view engine", "ejs");
+
+// Middleware for parsing POST requests
+app.use(express.urlencoded({ extended: true }));
 
 // Function to generate a random string
 function generateRandomString() {
@@ -20,109 +25,129 @@ function generateRandomString() {
   return result;
 }
 
+function findUserByEmail(email) {
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return users[userId];
+    }
+  }
+  return null; // User not found
+}
+
+
+const users = {
+  userRandomID: {
+    id: "userRandomID",
+    email: "user@example.com",
+    password: bcrypt.hashSync("purple-monkey-dinosaur", 10), // Hashed password
+  },
+  // Add more users as needed
+};
+
 const urlDatabase = {
   b2xVn2: "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com",
 };
 
-app.use(express.urlencoded({ extended: true }));
+// Middleware to check if a user is logged in
+app.use((req, res, next) => {
+  const userId = req.cookies["user_id"];
+  res.locals.user = users[userId];
+  next();
+});
+
+// Home page
+app.get("/", (req, res) => {
+  res.send("Hello!");
+});
+
+// Registration routes
+app.get("/register", (req, res) => {
+  // Render the registration form
+  res.render("register");
+});
+
+app.post("/register", (req, res) => {
+  const { email, password } = req.body;
+  // Check if the email already exists in users
+  for (const userId in users) {
+    if (users[userId].email === email) {
+      return res.status(400).send("Email already registered");
+    }
+  }
+  // Create a new user and store their data
+  const userId = generateRandomString();
+  users[userId] = {
+    id: userId,
+    email: email,
+    password: bcrypt.hashSync(password, 10), // Hash the password
+  };
+  res.cookie("user_id", userId);
+  res.redirect("/urls");
+});
+
+// Login routes
+app.get("/login", (req, res) => {
+  // Render the login form
+  res.render("login");
+});
+
+app.post("/login", (req, res) => {
+  const { email, password } = req.body;
+
+  // Find the user by email using a helper function (e.g., findUserByEmail)
+  const user = findUserByEmail(email);
+
+  // Check if the user exists and the password is correct
+  if (user && bcrypt.compareSync(password, user.password)) {
+    res.cookie("user_id", user.id);
+    res.redirect("/urls");
+  } else {
+    res.status(403).send("Authentication failed: Incorrect email or password");
+  }
+});
+
+
+// Logout route
+app.post("/logout", (req, res) => {
+  res.clearCookie("user_id");
+  res.redirect("/login"); // Redirect to the /login page
+});
+
+
+
+// URLs routes (example)
+app.get("/urls", (req, res) => {
+  const templateVars = {
+    urls: urlDatabase,
+  };
+  res.render("urls_index", templateVars);
+});
 
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
 
-app.get("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const longURL = urlDatabase[id];
-  const templateVars = { id, longURL };
-  res.render("urls_show", templateVars);
-});
-
-app.get("/urls", (req, res) => {
-  const templateVars = {
-    username: req.cookies["username"], // Pass the username
-    urls: urlDatabase, // Any other variables you want to pass to the view
-  };
-  res.render("urls_index", templateVars);
-});
-
-
 app.post("/urls", (req, res) => {
-  const longURL = req.body.longURL;
-  const shortURL = generateRandomString();
-
-  // Save the new URL mapping to the urlDatabase
-  urlDatabase[shortURL] = longURL;
-
-  res.redirect(`/urls/${shortURL}`);
+  // Handle URL creation
 });
 
-app.post("/urls/:id/delete", (req, res) => {
-  const id = req.params.id;
-
-  // Use JavaScript's delete operator to remove the URL
-  delete urlDatabase[id];
-
-  // Redirect the client back to the urls_index page ("/urls")
-  res.redirect("/urls");
+app.get("/urls/:id", (req, res) => {
+  // Handle URL details page
 });
 
-app.post("/urls/:id", (req, res) => {
-  const id = req.params.id;
-  const newLongURL = req.body.newLongURL; // Assuming you have a form field with name="newLongURL"
-
-  // Update the URL in your urlDatabase
-  urlDatabase[id] = newLongURL;
-
-  // Redirect the client back to /urls
-  res.redirect("/urls");
-});
-
-app.post("/login", (req, res) => {
-  const { username } = req.body; // Get the username from the request body
-  res.cookie("username", username); // Set the username as a cookie
-  res.redirect("/urls"); // Redirect back to the /urls page
-});
-
-app.post("/logout", (req, res) => {
-  res.clearCookie("username"); // Clear the username cookie
-  res.redirect("/urls"); // Redirect back to the /urls page (or any other desired page)
-});
-
-
-app.get("/u/:id", (req, res) => {
-  const shortURL = req.params.id;
+// Redirect to long URL
+app.get("/u/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
-
   if (longURL) {
     res.redirect(longURL);
   } else {
-    // Handle the case where the shortURL is not found
     res.status(404).send("Short URL not found");
   }
 });
 
-app.get("/", (req, res) => {
-  res.send("Hello!");
-});
-
-app.get("/register", (req, res) => {
-  res.render("register");
-});
-
-app.use((req, res, next) => {
-  res.locals.partialHeader = "partials/_header";
-  next();
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
-});
-
+// Listen on the specified port
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
 });

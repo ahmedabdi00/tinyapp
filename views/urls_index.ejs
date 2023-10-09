@@ -1,3 +1,5 @@
+<!--views/urls_index.ejs -->
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -32,19 +34,19 @@
           </thead>
           <tbody>
             <% for (const shortURL in urls) { %>
-              <tr>
-                <td><%= urls[shortURL] %></td>
-                <td><a href="/u/<%= shortURL %>"><%= shortURL %></a></td>
-                <!-- Add Edit link -->
-                <td><a href="/urls/<%= shortURL %>">Edit</a></td>
-                <!-- Add Delete button -->
-                <td>
-                  <form method="POST" action="/urls/<%= shortURL %>/delete">
-                    <button type="submit" class="btn btn-danger">Delete</button>
-                  </form>
-                </td>
-              </tr>
-              
+            <tr>
+              <td><%= urls[shortURL] %></td>
+              <td><a href="/u/<%= shortURL %>"><%= shortURL %></a></td>
+              <!-- Add Edit link -->
+              <td><a href="/urls/<%= shortURL %>">Edit</a></td>
+              <!-- Add Delete button -->
+              <td>
+                <form method="POST" action="/urls/<%= shortURL %>/delete">
+                  <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+              </td>
+            </tr>
+
             <% } %>
           </tbody>
         </table>
