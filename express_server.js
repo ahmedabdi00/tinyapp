@@ -8,7 +8,7 @@ import {
   userIdFromEmail,
   urlsForUser,
   cookieHasUser,
-} from './helpers.js'; // Update the path and add the '.mjs' extension
+} from './helpers.js';
 
 const app = express();
 const PORT = 8080;
@@ -192,19 +192,21 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
-app.post('/urls/:id', (req, res) => {
+app.get('/urls/:id', (req, res) => {
   const userID = req.session.user_id;
   const userUrls = urlsForUser(userID, urlDatabase);
-  if (Object.keys(userUrls).includes(req.params.id)) {
-    const shortURL = req.params.id;
-    urlDatabase[shortURL].longURL = req.body.newURL;
-    res.redirect('/urls');
+  const shortURL = req.params.id;
+
+  if (!userID) {
+    res.redirect('/login');
+  } else if (Object.keys(userUrls).includes(shortURL)) {
+    const templateVars = { user: users[userID], shortURL, longURL: urlDatabase[shortURL].longURL };
+    res.render('urls_show', templateVars);
   } else {
-    res
-      .status(401)
-      .send('You do not have authorization to edit this short URL.');
+    res.status(401).send('You do not have authorization to view this short URL.');
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`Example app listening on port ${PORT}!`);
