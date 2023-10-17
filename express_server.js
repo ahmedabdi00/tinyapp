@@ -193,8 +193,29 @@ app.post('/urls/:shortURL/delete', (req, res) => {
 });
 
 app.post('/urls/:shortURL/update', (req, res) => {
-  const newURL = req.body.newURL;
-  const shortURL = req.params.shortURL;
+
+  const user_id = req.session.user_id;
+  if(!user_id) {
+    return res.status(401).json({ error: "Must be logged in" });
+  }
+
+  const newUrl = req.body.newURL;
+  if(newUrl.trim() === "") {
+    return res.status(400).json({ error: "No newURL found. Please provide newURL" });
+  }
+
+
+  const urlObj = urlDatabase[req.params.shortURL]
+  if (!urlObj) {
+    return res.status(404).json({ error: "URL not found" });
+  }
+
+  if (urlObj.userID !== user_id) {
+    return res.status(403).json({ error: "This URL dose not belong to you!"});
+  }
+
+  
+  urlDatabase[req.params.shortURL].longURL = newUrl
 
   res.redirect('/urls');
 });
