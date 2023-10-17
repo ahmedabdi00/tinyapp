@@ -192,6 +192,15 @@ app.post('/urls/:shortURL/delete', (req, res) => {
   }
 });
 
+app.post('/urls/:shortURL/update', (req, res) => {
+  const newURL = req.body.newURL;
+  const shortURL = req.params.shortURL;
+
+  res.redirect('/urls');
+});
+
+
+
 app.get('/urls/:id', (req, res) => {
   const userID = req.session.user_id;
   const userUrls = urlsForUser(userID, urlDatabase);
