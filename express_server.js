@@ -137,7 +137,7 @@ app.post('/register', (req, res) => {
   if (!submittedEmail || !submittedPassword) {
     res.status(400).send('Please include both a valid email and password');
   } else if (emailHasUser(submittedEmail, users)) {
-    res.status(400).send('An account already exists for this email address');
+    res.redirect('/login'); // Redirect to the login page
   } else {
     const newUserID = generateRandomString();
     users[newUserID] = {
@@ -147,7 +147,7 @@ app.post('/register', (req, res) => {
     };
     req.session.user_id = newUserID;
     res.redirect('/urls');
-  }
+  }  
 });
 
 app.post('/login', (req, res) => {
@@ -191,6 +191,15 @@ app.post('/urls/:shortURL/delete', (req, res) => {
       .send('You do not have authorization to delete this short URL.');
   }
 });
+
+app.post('/urls/:shortURL/update', (req, res) => {
+  const newURL = req.body.newURL;
+  const shortURL = req.params.shortURL;
+
+  res.redirect('/urls');
+});
+
+
 
 app.get('/urls/:id', (req, res) => {
   const userID = req.session.user_id;
